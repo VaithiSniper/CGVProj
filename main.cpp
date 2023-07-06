@@ -83,7 +83,7 @@ void moon() {
 
   GLfloat angle;
   glLineWidth(1.5);
-  glColor3f(93.0 / 255.0, 93.0 / 255.0, 93.0 / 255.0);
+  glColor3f(211.0 / 255.0, 204.0 / 255.0, 204.0 / 255.0);
   glBegin(GL_POLYGON);
   for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
