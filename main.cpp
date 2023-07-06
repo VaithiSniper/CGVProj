@@ -30,11 +30,14 @@ int s = 0;
 int dropped_eggs = 0;
 double speed_1 = 1, speed_2 = 1.5, speed_3 = 2, speed_4 = 2.5;
 int w = 48, h = 48, t = 10, e = 9, g = 12;
+int mooncraterset = 0;
 void myinit();
 void start_screen(int, int);
 void displayIntro();
 void cloud1();
 void egg();
+void moon();
+void mooncrater(int, int);
 void drawLine(int *, int *);
 void basket(int, int);
 void duck(int, int);
@@ -43,12 +46,15 @@ void egg_start();
 void color();
 void score();
 void display(void);
+void displayDay();
+void displayNight();
+void constantRendersAcrossDayAndNight();
 void basket_set(int, int);
 void myReshape(int, int);
 void keys(unsigned char, int, int);
 void menu(int);
-void myinit()
-{
+void timeAdjustMenu(int);
+void myinit() {
   glViewport(0, 0, a, b);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -57,17 +63,52 @@ void myinit()
   glutPostRedisplay();
 }
 
-void sun()
-{
+void mooncrater(int x, int y) {
+  float theta;
+  if (mooncraterset == 0) {
+    glColor3f(255.0 / 255.0, 255.0 / 255.0, 255.0 / 255.0);
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < 360; i++) {
+      theta = i * PI * i / 180;
+      glVertex2f(x + 3 * cos(theta) / 2, y + 3 * sin(theta) / 2);
+    }
+    glEnd();
+  }
+  mooncraterset = 1;
+}
+
+void moon() {
 
   float theta;
 
   GLfloat angle;
   glLineWidth(1.5);
-  glColor3f(1, 0.2, 0);
+  glColor3f(93.0 / 255.0, 93.0 / 255.0, 93.0 / 255.0);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
+    theta = i * PI * i / 180;
+    glVertex2f(500 + 80 * cos(theta) / 2, 600 + 80 * sin(theta) / 2);
+  }
+
+  for (int i = 0; i < 15; i++) {
+    int offset = rand() % 160;
+    int p = 420 + offset;
+    mooncrater(p, p);
+  }
+
+  glEnd();
+  glFlush();
+}
+
+void sun() {
+
+  float theta;
+
+  GLfloat angle;
+  glLineWidth(1.5);
+  glColor3f(249 / 255.0, 228 / 255.0, 25 / 255.0);
+  glBegin(GL_POLYGON);
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(500 + 80 * cos(theta) / 2, 600 + 80 * sin(theta) / 2);
   }
@@ -76,8 +117,7 @@ void sun()
   glFlush();
 }
 
-void cloud1()
-{
+void cloud1() {
 
   float theta;
 
@@ -85,8 +125,7 @@ void cloud1()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(100 + 50 * cos(theta) / 2, 590 + 50 * sin(theta) / 2);
   }
@@ -96,8 +135,7 @@ void cloud1()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(130 + 50 * cos(theta) / 2, 580 + 50 * sin(theta) / 2);
   }
@@ -106,8 +144,7 @@ void cloud1()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(140 + 50 * cos(theta) / 2, 600 + 50 * sin(theta) / 2);
   }
@@ -116,8 +153,7 @@ void cloud1()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(170 + 50 * cos(theta) / 2, 590 + 50 * sin(theta) / 2);
   }
@@ -126,14 +162,12 @@ void cloud1()
   glFlush();
 }
 
-void cloud2()
-{
+void cloud2() {
   float theta;
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(420 + 45 * cos(theta) / 2, 540 + 45 * sin(theta) / 2);
   }
@@ -143,8 +177,7 @@ void cloud2()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(455 + 45 * cos(theta) / 2, 550 + 45 * sin(theta) / 2);
   }
@@ -154,8 +187,7 @@ void cloud2()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(455 + 45 * cos(theta) / 2, 530 + 45 * sin(theta) / 2);
   }
@@ -165,8 +197,7 @@ void cloud2()
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
-  for (int i = 0; i < 360; i++)
-  {
+  for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(490 + 45 * cos(theta) / 2, 540 + 45 * sin(theta) / 2);
   }
@@ -175,8 +206,7 @@ void cloud2()
   glFlush();
 }
 
-void line(int i, int j)
-{
+void line(int i, int j) {
 
   glBegin(GL_QUADS);
   glColor3f(1.0, .5, 0.5);
@@ -188,23 +218,36 @@ void line(int i, int j)
   glFlush();
 }
 
-void backk(int i, int j)
-{
-
-  glColor3f(0, .5, 1);
+void backnight(int i, int j) {
   glBegin(GL_QUADS);
+  glColor3f(7 / 255.0, 16 / 255.0, 43 / 255.0);
   glVertex2f(0.0 + i, 0.0 + j);
   glVertex2f(600.0 + i, 0.0 + j);
+  glColor3f(17 / 255.0, 48 / 255.0, 88 / 255.0);
   glVertex2f(600.0 + i, -500 + j);
   glVertex2f(0.0 + i, -500 + j);
   glEnd();
   glFlush();
 }
-void ground(int i, int j)
-{
 
+void backk(int i, int j) {
   glBegin(GL_QUADS);
-  glColor3f(0, 1.0, 0);
+  glColor3f(0.0, 0.5, 1.0);
+  glVertex2f(0.0 + i, 0.0 + j);
+  glVertex2f(600.0 + i, 0.0 + j);
+  glColor3f(0, 0.2, 0.9);
+  glVertex2f(600.0 + i, -500 + j);
+  glVertex2f(0.0 + i, -500 + j);
+  glEnd();
+  glFlush();
+}
+
+void ground(int i, int j, int timeType) {
+  glBegin(GL_QUADS);
+  if (timeType == 0)
+    glColor3f(0, 1.0, 0);
+  else
+    glColor3f(0.2, 0.5, 0.2);
   glVertex2f(0.0 + i, 0.0 + j);
   glVertex2f(600.0 + i, 0.0 + j);
   glVertex2f(600.0 + i, -j);
@@ -212,8 +255,7 @@ void ground(int i, int j)
   glEnd();
 }
 
-void start_screen()
-{
+void start_screen() {
   // Set background color
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -232,8 +274,7 @@ void start_screen()
   glPointSize(4.0);
   glBegin(GL_POINTS);
   glColor3f(1.0, 1.0, 1.0);
-  for (int i = 0; i <= 10; i++)
-  {
+  for (int i = 0; i <= 10; i++) {
     int x = rand() % 600;
     int y = rand() % 600;
     glVertex2f(x, y);
@@ -241,28 +282,26 @@ void start_screen()
   glEnd();
 
   int k;
-  char cat[4] = "EGG";
+  char cat[4] = "Egg";
   char orr[9] = "Catching";
   char hatch[5] = "Game";
-  char start[20] = "Press S for start";
+  char start[20] = "Press S to start";
   char authors[8] = "Made by";
   char author1[16] = "Vaitheeswaran J";
   char author2[8] = "Shivani";
 
-  glColor3f(0, 1, 0);
-  glRasterPos2i(150, 320);
+  glColor3f(1, 1, 1);
+  glRasterPos2i(150 + 60, 600);
   for (k = 0; k < 4; k++)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, cat[k]);
-  glColor3f(1, 1, 1);
-  glRasterPos2i(200, 320);
+  glRasterPos2i(190 + 60, 600);
   for (k = 0; k < 9; k++)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, orr[k]);
-  glColor3f(1, 0, 0);
-  glRasterPos2i(300, 320);
+  glRasterPos2i(273 + 60, 600);
   for (k = 0; k < 5; k++)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, hatch[k]);
   glColor3f(1, 1, 0);
-  glRasterPos2i(210, 200);
+  glRasterPos2i(210, 150);
   for (k = 0; k < 20; k++)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, start[k]);
   glRasterPos2i(400, 50);
@@ -280,8 +319,7 @@ void start_screen()
   glutSwapBuffers();
 }
 
-void loadIntro(void)
-{
+void loadIntro(void) {
   glGenTextures(1, &intro);
   glBindTexture(GL_TEXTURE_2D, intro);
   // set the bg1 wrapping/filtering options (on the currently bound bg1 object)
@@ -293,21 +331,17 @@ void loadIntro(void)
   int width, height, nrChannels;
   unsigned char *data = stbi_load("introBanner.psd", &width, &height,
                                   &nrChannels, STBI_rgb_alpha);
-  if (data)
-  {
+  if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data);
     // glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  else
-  {
+  } else {
     std::cout << "Failed to load bg1" << std::endl;
   }
   stbi_image_free(data);
 }
 
-void displayIntro()
-{
+void displayIntro() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_TEXTURE_2D);
   glColor3f(1, 1, 1);
@@ -327,8 +361,7 @@ void displayIntro()
   glutSwapBuffers();
 }
 
-void egg()
-{
+void egg() {
   float x, y, z;
   int t;
   if (typeOfEgg == 1)
@@ -338,8 +371,7 @@ void egg()
   else
     glColor3f(1.0, 0.843, 0);
   glBegin(GL_POLYGON);
-  for (t = 0; t <= 360; t += 1)
-  {
+  for (t = 0; t <= 360; t += 1) {
     x = egg_xc + 8 * (cos(t));
     y = egg_yc + 16 * (sin(t));
     z = 0;
@@ -348,8 +380,7 @@ void egg()
   glEnd();
 }
 
-void basket(int i, int j)
-{
+void basket(int i, int j) {
   j = 10;
   if (i >= a - 60)
     i = a - 60;
@@ -361,8 +392,7 @@ void basket(int i, int j)
   glVertex2f(60.0 + i, 30.0 + j);
   glEnd();
 }
-void duck(int i, int j)
-{
+void duck(int i, int j) {
   int h;
   glColor3f(1.0, 1.0, 0.0);
   glBegin(GL_POLYGON);
@@ -377,8 +407,7 @@ void duck(int i, int j)
   glVertex2f(32.5 + i, 57.5 + j);
   glEnd();
   glFlush();
-  for (h = 0; h < 13; h += 4)
-  {
+  for (h = 0; h < 13; h += 4) {
     glBegin(GL_LINES);
     glColor3f(0.7, 0.4, 0);
     glVertex2f(57.5 + h + i, 52.5 + h + j);
@@ -409,8 +438,7 @@ void duck(int i, int j)
   glFlush();
 }
 
-void displayScore()
-{
+void displayScore() {
 
   std::string::iterator k;
 
@@ -433,8 +461,7 @@ void displayScore()
   glBegin(GL_POINTS);
   glVertex2f(300, 300);
   glColor3f(1.0, 1.0, 1.0);
-  for (int i = 0; i <= 10; i++)
-  {
+  for (int i = 0; i <= 10; i++) {
     int x = rand() % 600;
     int y = rand() % 600;
     glVertex2f(x, y);
@@ -496,8 +523,7 @@ void displayScore()
   glutSwapBuffers();
 }
 
-void drawLine(int *p1, int *p2)
-{
+void drawLine(int *p1, int *p2) {
   glLineWidth(2);
   glBegin(GL_LINES);
   glVertex2iv(p1);
@@ -505,8 +531,7 @@ void drawLine(int *p1, int *p2)
   glEnd();
 }
 
-void print_score()
-{
+void print_score() {
   printf("\nLevel reached: %d\n\n", level_count);
   printf("\nNo. of eggs dropped= %d \n", dropped_eggs);
   printf("\nNo. of eggs caught = %d\n", eggs_caught);
@@ -515,11 +540,9 @@ void print_score()
   getchar();
   exit(0);
 }
-void egg_start()
-{
+void egg_start() {
   egg_yc = 375;
-  if (missed_eggs >= 10)
-  {
+  if (missed_eggs >= 10) {
     printf("\n\n\t\t\t\tGAME OVER\n\n");
     print_score();
   }
@@ -535,8 +558,7 @@ void egg_start()
   if (typeOfEgg != 2)
     dropped_eggs++;
 
-  switch (rand() % 9)
-  {
+  switch (rand() % 9) {
   case 0:
     egg_xc = 115;
     break;
@@ -567,10 +589,8 @@ void egg_start()
   }
 }
 
-void score()
-{
-  if (egg_yc <= 50 && (egg_xc >= basket_x && egg_xc <= basket_x + 60))
-  {
+void score() {
+  if (egg_yc <= 50 && (egg_xc >= basket_x && egg_xc <= basket_x + 60)) {
     printf("\a");
     if (typeOfEgg == 0)
       eggs_caught += 3;
@@ -582,18 +602,36 @@ void score()
   }
   missed_eggs = dropped_eggs - eggs_caught;
 }
-void display(void)
-{
-  glClear(GL_COLOR_BUFFER_BIT);
-  ground(0, 650);
-  backk(0, 650);
+
+void constantRendersAcrossDayAndNight() {
   duck(40, 375);
   duck(180, 375);
   duck(320, 375);
-  sun();
   cloud1();
   cloud2();
   line(0, 375);
+}
+
+void displayNight() {
+  glClear(GL_COLOR_BUFFER_BIT);
+  ground(0, 650, 1);
+  backnight(0, 650);
+  moon();
+  constantRendersAcrossDayAndNight();
+  display();
+}
+
+void displayDay() {
+  glClear(GL_COLOR_BUFFER_BIT);
+  ground(0, 650, 0);
+  backk(0, 650);
+  sun();
+  constantRendersAcrossDayAndNight();
+  mooncraterset = 0;
+  display();
+}
+
+void display(void) {
 
   int i;
   char level1[12] = "LEVEL 1";
@@ -601,31 +639,24 @@ void display(void)
   char level3[12] = "LEVEL 3";
   char level4[12] = "LEVEL 4";
 
-  if (s >= 1)
-  {
-    if (level_count == 1)
-    {
+  if (s >= 1) {
+    if (level_count == 1) {
       glColor3f(1, 1, 1);
       glRasterPos2i(500, 300);
       for (i = 0; i < 12; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, level1[i]);
-    }
-    else if (level_count == 2)
-    {
+    } else if (level_count == 2) {
       glColor3f(1, 0, 0);
       glRasterPos2i(500, 300);
       for (i = 0; i < 12; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, level2[i]);
-    }
-    else if (level_count == 3)
-    {
+    } else if (level_count == 3) {
       glColor3f(0, 1, 1);
       glRasterPos2i(500, 300);
       for (i = 0; i < 12; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, level3[i]);
     }
-    if (level_count == 4)
-    {
+    if (level_count == 4) {
       glColor3f(1, 0, 1);
       glRasterPos2i(500, 300);
       for (i = 0; i < 12; i++)
@@ -637,36 +668,30 @@ void display(void)
 
     egg();
     basket(basket_x, basket_y);
-    if (eggs_caught >= 10)
-    {
+    if (eggs_caught >= 10) {
       egg_yc -= speed_2;
       level_count = 2;
     }
-    if (eggs_caught >= 20)
-    {
+    if (eggs_caught >= 20) {
       egg_yc -= speed_3;
       level_count = 3;
     }
-    if (eggs_caught >= 30)
-    {
+    if (eggs_caught >= 30) {
       egg_yc -= speed_4;
       level_count = 4;
-    }
-    else
+    } else
       egg_yc -= speed_1;
     score();
   }
   glFlush();
   glutSwapBuffers();
 }
-void basket_set(int a, int b)
-{
+void basket_set(int a, int b) {
   basket_x = a;
   basket_y = b;
   glutPostRedisplay();
 }
-void myReshape(int w, int h)
-{
+void myReshape(int w, int h) {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluOrtho2D(0.0, (GLdouble)w, 0.0, (GLdouble)h);
@@ -676,41 +701,40 @@ void myReshape(int w, int h)
   a = w;
   b = h;
 }
-void keys(unsigned char key, int x, int y)
-{
-  if (key == 'q' || key == 'Q')
-  {
+void keys(unsigned char key, int x, int y) {
+  if (key == 'q' || key == 'Q') {
     glutDisplayFunc(displayScore);
     glutIdleFunc(displayScore);
     glutPostRedisplay();
     // printf("\n\n\n\t\tQUIT BY PLAYER\n\n");
     // print_score();
   }
-  if (key == 's' || key == 'S')
-  {
+  if (key == 's' || key == 'S') {
     s += 1;
-    glutDisplayFunc(display);
-    glutIdleFunc(display);
+    glutDisplayFunc(displayDay);
+    glutIdleFunc(displayDay);
     glutPostRedisplay();
   }
-
-  if (key == 'a' || key == 'A')
-  {
+  if (key == 'n' || key == 'N') {
+    s += 1;
+    glutDisplayFunc(displayNight);
+    glutIdleFunc(displayNight);
+    glutPostRedisplay();
+  }
+  if (key == 'a' || key == 'A') {
     egg_xc -= 10;
     if (egg_xc <= 0)
       egg_xc = 10;
   }
-  if (key == 'd' || key == 'D')
-  {
+  if (key == 'd' || key == 'D') {
     egg_xc += 10;
     if (egg_xc >= 500)
       egg_xc = 490;
   }
 }
-void menu(int id)
-{
-  switch (id)
-  {
+
+void menu(int id) {
+  switch (id) {
   case 1:
     glutDisplayFunc(display);
     glutIdleFunc(display);
@@ -720,7 +744,6 @@ void menu(int id)
   case 2:
     glutDisplayFunc(displayScore);
     glutIdleFunc(displayScore);
-    glutPostRedisplay();
     break;
   case 3:
     printf("\n\n\n\t\tQUIT BY PLAYER\n");
@@ -731,8 +754,25 @@ void menu(int id)
   }
   glutPostRedisplay();
 }
-int main(int argc, char **argv)
-{
+
+void timeAdjustMenu(int id) {
+  switch (id) {
+  case 4:
+    glutDisplayFunc(displayDay);
+    glutIdleFunc(displayDay);
+    break;
+  case 5:
+    glutDisplayFunc(displayNight);
+    glutIdleFunc(displayNight);
+    break;
+  default:
+    exit(0);
+  }
+  glutPostRedisplay();
+}
+
+int main(int argc, char **argv) {
+  system("gwenview introBanner.psd");
   printf("******************************************************************");
   printf("\n\t\t\t\t EGG GAME\n\n");
   printf("******************************************************************");
@@ -752,9 +792,13 @@ int main(int argc, char **argv)
   glutCreateWindow("EGG GAME");
   myinit();
   glutInitWindowPosition(100, 100);
+  int submenu = glutCreateMenu(timeAdjustMenu);
+  glutAddMenuEntry("Day", 4);
+  glutAddMenuEntry("Night", 5);
   glutCreateMenu(menu);
   glutAddMenuEntry("Start game", 1);
   glutAddMenuEntry("View score", 2);
+  glutAddSubMenu("Adjust time", submenu);
   glutAddMenuEntry("Quit without score", 3);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
   glutDisplayFunc(start_screen);
