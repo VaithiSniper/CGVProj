@@ -31,6 +31,7 @@ int dropped_eggs = 0;
 double speed_1 = 1, speed_2 = 1.5, speed_3 = 2, speed_4 = 2.5;
 int w = 48, h = 48, t = 10, e = 9, g = 12;
 int mooncraterset = 0;
+float rotang = 0;
 void myinit();
 void start_screen(int, int);
 void displayIntro();
@@ -84,7 +85,17 @@ void moon() {
   GLfloat angle;
   glLineWidth(1.5);
   glColor3f(211.0 / 255.0, 204.0 / 255.0, 204.0 / 255.0);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glTranslatef(-0.5 * rotang, 100.0, 0);
+  glScalef(0.8, 0.8, 1.0);
   glBegin(GL_POLYGON);
+  if (rotang > 1450) {
+    rotang -= 1450;
+    glutDisplayFunc(displayDay);
+    glutIdleFunc(displayDay);
+  }
+  rotang++;
   for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(500 + 80 * cos(theta) / 2, 600 + 80 * sin(theta) / 2);
@@ -98,6 +109,8 @@ void moon() {
 
   glEnd();
   glFlush();
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void sun() {
@@ -107,29 +120,39 @@ void sun() {
   GLfloat angle;
   glLineWidth(1.5);
   glColor3f(249 / 255.0, 228 / 255.0, 25 / 255.0);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glTranslatef(-0.5 * rotang, 0, 0);
   glBegin(GL_POLYGON);
+  if (rotang > 1450) {
+    rotang -= 1450;
+    glutDisplayFunc(displayNight);
+    glutIdleFunc(displayNight);
+  }
+  rotang++;
+  // glRotatef(rotang, 0, 0, 0);
   for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
-    glVertex2f(500 + 80 * cos(theta) / 2, 600 + 80 * sin(theta) / 2);
+    glVertex2f(700 + 80 * cos(theta) / 2, 600 + 80 * sin(theta) / 2);
   }
-
   glEnd();
   glFlush();
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void cloud1() {
 
   float theta;
-
   GLfloat angle;
   glLineWidth(1.5);
   glColor3f(1, 1, 1);
   glBegin(GL_POLYGON);
+  glScalef(1.3, 1.1, 1.0);
   for (int i = 0; i < 360; i++) {
     theta = i * PI * i / 180;
     glVertex2f(100 + 50 * cos(theta) / 2, 590 + 50 * sin(theta) / 2);
   }
-
   glEnd();
   // GLfloat angle;
   glLineWidth(1.5);
@@ -580,7 +603,6 @@ void egg_start() {
   case 7:
     egg_xc = 115;
     break;
-  case 6:
     egg_xc = 255;
     break;
   case 8:
@@ -617,6 +639,10 @@ void displayNight() {
   ground(0, 650, 1);
   backnight(0, 650);
   moon();
+  // glRotatef(3.14 * 30 / 180.0, 200.0, 200.0, 0.0);
+  // glScalef(1.2, 1.05, 1.0);
+
+  glLoadIdentity();
   constantRendersAcrossDayAndNight();
   display();
 }
